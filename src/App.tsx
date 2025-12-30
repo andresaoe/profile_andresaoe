@@ -55,7 +55,12 @@ type Profile = {
 
 type SimpleIconSpec = { slug: string; darkModeColor?: string; size?: number }
 
+const preferJsdelivrSlugs = new Set(['openai', 'anthropic', 'githubcopilot', 'googlegemini'])
+
 function simpleIconSrc({ slug, darkModeColor, size = 16 }: SimpleIconSpec) {
+  if (preferJsdelivrSlugs.has(slug) && !darkModeColor) {
+    return simpleIconFallbackSrc(slug)
+  }
   const base = `https://cdn.simpleicons.org/${slug}`
   const colored = darkModeColor ? `${base}/_/${darkModeColor}` : base
   return `${colored}?viewbox=auto&size=${size}`
@@ -206,6 +211,14 @@ const modernTech = [
   {
     name: 'Git',
     icon: simpleIconByName.Git,
+  },
+  {
+    name: 'GitHub',
+    icon: simpleIconByName.GitHub,
+  },
+  {
+    name: 'Vercel',
+    icon: simpleIconByName.Vercel,
   },
 ] as const
 
