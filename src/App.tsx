@@ -437,6 +437,8 @@ function App() {
     { id: 'contact', label: 'Contacto' },
   ]
 
+  const [navOpen, setNavOpen] = useState(false)
+
   const [contactName, setContactName] = useState('')
   const [contactEmail, setContactEmail] = useState('')
   const [contactMessage, setContactMessage] = useState('')
@@ -572,9 +574,9 @@ function App() {
     <div className="min-h-dvh bg-slate-950 text-slate-100">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(1200px_circle_at_20%_-10%,rgba(56,189,248,0.20),transparent_60%),radial-gradient(900px_circle_at_85%_10%,rgba(167,139,250,0.18),transparent_55%),radial-gradient(700px_circle_at_40%_110%,rgba(34,197,94,0.12),transparent_55%)]" />
 
-      <div className="relative mx-auto max-w-6xl px-4 py-10">
+      <div className="relative mx-auto max-w-6xl px-4 py-8 sm:py-10">
         <header className="sticky top-0 z-30 -mx-4 mb-8 border-b border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 overflow-hidden rounded-full ring-1 ring-white/10">
                 <img
@@ -590,7 +592,7 @@ function App() {
               </div>
               <div className="text-sm font-semibold tracking-tight text-white">{profile.name}</div>
             </div>
-            <nav className="-mx-1 flex max-w-full flex-wrap items-center gap-1">
+            <nav className="-mx-1 hidden max-w-full flex-wrap items-center gap-1 md:flex">
               {sections.map((s) => (
                 <a
                   key={s.id}
@@ -601,12 +603,58 @@ function App() {
                 </a>
               ))}
             </nav>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 md:hidden"
+              aria-expanded={navOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setNavOpen((prev) => !prev)}
+            >
+              <span className="sr-only">Abrir menú</span>
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                className="h-5 w-5 text-slate-200"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                {navOpen ? (
+                  <>
+                    <path d="M18 6 6 18" />
+                    <path d="M6 6l12 12" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M4 6h16" />
+                    <path d="M4 12h16" />
+                    <path d="M4 18h16" />
+                  </>
+                )}
+              </svg>
+            </button>
           </div>
+          <nav
+            id="mobile-nav"
+            className={navOpen ? 'mt-3 grid gap-1 md:hidden' : 'hidden md:hidden'}
+          >
+            {sections.map((s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                className="rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                onClick={() => setNavOpen(false)}
+              >
+                {s.label}
+              </a>
+            ))}
+          </nav>
         </header>
 
         <div className="grid gap-10 md:grid-cols-[280px_1fr] md:items-start">
           <aside className="md:sticky md:top-10">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
               <div className="relative mb-4 w-fit">
                 <div className="rounded-2xl bg-gradient-to-br from-amber-200 via-yellow-500 to-amber-300 p-[2px]">
                   <div className="rounded-[14px] bg-slate-950/60 p-1">
@@ -681,7 +729,7 @@ function App() {
           <main className="min-w-0">
             <section id="hero" className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
               <p className="text-sm font-medium text-sky-300">Portafolio · Hoja de vida</p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+              <h1 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
                 {profile.role}
               </h1>
               <p className="mt-4 max-w-prose text-justify text-sm leading-relaxed text-slate-300 md:text-base">
@@ -725,8 +773,8 @@ function App() {
             </section>
 
             <section id="about" className="mt-8">
-              <h2 className="text-xl font-semibold tracking-tight text-white">Sobre mí</h2>
-              <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-6">
+              <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Sobre mí</h2>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
                 <div className="mt-4 grid gap-3 text-justify text-sm leading-relaxed text-slate-300 md:text-base">
                   <p>
                     Me destaco por la comunicación clara, responsabilidad, mentalidad de mejora continua y trabajo en
@@ -764,12 +812,12 @@ function App() {
             </section>
 
             <section id="experience" className="mt-10">
-              <h2 className="text-xl font-semibold tracking-tight text-white">Experiencia</h2>
-              <ol className="mt-4 grid gap-4 border-l border-white/10 pl-6">
+              <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Experiencia</h2>
+              <ol className="mt-4 grid gap-4 border-l border-white/10 pl-5 sm:pl-6">
                 {profile.experience.map((e) => (
                   <li key={`${e.role}-${e.period}`} className="relative">
-                    <span className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-sky-300/80" />
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-justify">
+                    <span className="absolute -left-[25px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-sky-300/80 sm:-left-[29px]" />
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-justify sm:p-6">
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <div>
                           <h3 className="text-base font-semibold text-white">{e.role}</h3>
@@ -796,13 +844,13 @@ function App() {
             </section>
 
             <section id="education" className="mt-10">
-              <h2 className="text-xl font-semibold tracking-tight text-white">Educación</h2>
-              <ol className="mt-4 grid gap-4 border-l border-white/10 pl-6">
+              <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Educación</h2>
+              <ol className="mt-4 grid gap-4 border-l border-white/10 pl-5 sm:pl-6">
                 {profile.studies.map((s) => (
                   <Fragment key={`${s.title}-${s.period}`}>
                     <li className="relative">
-                      <span className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-violet-300/80" />
-                      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-justify">
+                      <span className="absolute -left-[25px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-violet-300/80 sm:-left-[29px]" />
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-justify sm:p-6">
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
                           <h3 className="text-base font-semibold text-white">{s.title}</h3>
                           <span className="text-sm text-slate-300">{s.period}</span>
@@ -841,8 +889,8 @@ function App() {
                     </li>
                     {s.diploma ? (
                       <li className="relative">
-                        <span className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-amber-300/80" />
-                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-justify">
+                        <span className="absolute -left-[25px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-amber-300/80 sm:-left-[29px]" />
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-justify sm:p-6">
                           <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <h3 className="text-base font-semibold text-white">{s.diploma.title}</h3>
                             <span className="text-sm text-slate-300">2024</span>
@@ -853,8 +901,8 @@ function App() {
                     ) : null}
                     {s.title === 'Cursos' && educationBadges.length ? (
                       <li className="relative">
-                        <span className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-emerald-300/80" />
-                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-justify">
+                        <span className="absolute -left-[25px] top-1.5 h-3 w-3 rounded-full border border-white/20 bg-emerald-300/80 sm:-left-[29px]" />
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-justify sm:p-6">
                           <div className="text-base font-semibold text-white">Insignias obtenidas</div>
                           <div className="mt-3 flex flex-wrap items-center gap-3">
                             {educationBadges.map((b) => {
@@ -880,7 +928,7 @@ function App() {
                               )
 
                               const tooltip = isOpen ? (
-                                <div className="pointer-events-none absolute left-1/2 top-0 z-20 w-72 -translate-x-1/2 -translate-y-full pb-2">
+                                <div className="pointer-events-none absolute left-1/2 top-0 z-20 w-72 max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-full pb-2">
                                   <div className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-xs leading-relaxed text-slate-100 shadow-lg">
                                     {b.howToEarn}
                                   </div>
@@ -927,7 +975,7 @@ function App() {
             </section>
 
             <section id="projects" className="mt-10">
-              <h2 className="text-xl font-semibold tracking-tight text-white">Proyectos</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Proyectos</h2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 {profile.projects.map((p) => (
                   <a
@@ -935,7 +983,7 @@ function App() {
                     href={p.href ?? '#'}
                     target={p.href ? '_blank' : undefined}
                     rel={p.href ? 'noreferrer' : undefined}
-                    className="group rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10"
+                    className="group rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 sm:p-6"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="text-base font-semibold text-white">{p.name}</h3>
@@ -960,7 +1008,7 @@ function App() {
             </section>
 
             <section id="skills" className="mt-10">
-              <h2 className="text-xl font-semibold tracking-tight text-white">Habilidades</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Habilidades</h2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 {skillGroups.map((g) => (
                   <div key={g.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
@@ -1005,8 +1053,8 @@ function App() {
             </section>
 
             <section id="contact" className="mt-10">
-              <h2 className="text-xl font-semibold tracking-tight text-white">Contacto</h2>
-              <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
+              <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Contacto</h2>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 md:p-8">
                 <div className="flex flex-wrap items-end justify-between gap-4">
                   <div>
                     <div className="text-sm text-slate-300">¿Trabajamos juntos?</div>
@@ -1097,7 +1145,9 @@ function App() {
 
             <footer className="mt-10 border-t border-white/10 pt-6 text-sm text-slate-400">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span>Hecho por @andresaoe y patrocinado por Trae AI la mejor inteligencia artificial</span>
+                <span className="w-full text-center sm:w-auto sm:text-left">
+                  Hecho por @andresaoe y patrocinado por Trae AI la mejor inteligencia artificial
+                </span>
               </div>
             </footer>
           </main>
