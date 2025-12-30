@@ -1,0 +1,35 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="32" y1="16" x2="224" y2="240" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1220" />
+      <stop offset="0.55" stop-color="#0F172A" />
+      <stop offset="1" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="shine" x1="56" y1="40" x2="200" y2="216" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" stop-opacity="0.35" />
+      <stop offset="0.5" stop-color="#A78BFA" stop-opacity="0.35" />
+      <stop offset="1" stop-color="#22C55E" stop-opacity="0.25" />
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg)" />
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#shine)" />
+  <path
+    d="M128 62c-24 0-43 19-43 43s19 43 43 43 43-19 43-43-19-43-43-43Z"
+    fill="#E2E8F0"
+    fill-opacity="0.9"
+  />
+  <path
+    d="M64 198c10-30 36-50 64-50s54 20 64 50"
+    stroke="#E2E8F0"
+    stroke-opacity="0.9"
+    stroke-width="16"
+    stroke-linecap="round"
+  />
+  <path
+    d="M88 110h80"
+    stroke="#0B1220"
+    stroke-opacity="0.18"
+    stroke-width="10"
+    stroke-linecap="round"
+  />
+</svg>
