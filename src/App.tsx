@@ -1,6 +1,5 @@
 import type { FormEvent } from 'react'
 import { Fragment, useState } from 'react'
-import { supabase } from './lib/supabaseClient'
 
 type LinkItem = { label: string; href: string }
 
@@ -144,6 +143,9 @@ const simpleIconByName: Record<string, SimpleIconSpec> = {
   Azure: { slug: 'microsoftazure' },
   Amazon: { slug: 'amazon', darkModeColor: 'fff' },
   Blogger: { slug: 'blogger' },
+  Gmail: { slug: 'gmail' },
+  Outlook: { slug: 'microsoftoutlook' },
+  Yahoo: { slug: 'yahoo' },
 }
 
 type BrandIconProps = { name: string; size?: number; className?: string }
@@ -457,8 +459,6 @@ function App() {
   const [contactMessage, setContactMessage] = useState('')
   const [contactStatus, setContactStatus] = useState<
     | { state: 'idle' }
-    | { state: 'sending' }
-    | { state: 'success'; message: string }
     | { state: 'error'; message: string }
   >({ state: 'idle' })
 
@@ -466,121 +466,45 @@ function App() {
 
   const educationBadges = profile.studies.flatMap((s) => s.badges ?? [])
 
-  const supabaseEnvReady = Boolean(
-    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
-  )
-  const supabaseReady = Boolean(supabase)
-
-  async function handleSubmitContact(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-
-    if (!supabase) {
-      setContactStatus({
-        state: 'error',
-        message: 'Faltan variables de entorno de Supabase (URL / ANON KEY).',
-      })
-      return
-    }
-
-    if (!e.currentTarget.checkValidity()) {
-      e.currentTarget.reportValidity()
-      setContactStatus({ state: 'error', message: 'Revisa los campos marcados.' })
-      return
-    }
-
+  function openEmailClient(provider: 'gmail' | 'outlook' | 'yahoo' | 'default') {
     const normalizedName = contactName.trim().replace(/\s+/g, ' ')
-    const normalizedEmail = contactEmail
-      .trim()
-      .replaceAll('\u00A0', '')
-      .replaceAll('\u200B', '')
-      .replaceAll('\u200C', '')
-      .replaceAll('\u200D', '')
-      .replaceAll('\uFEFF', '')
-      .toLowerCase()
     const normalizedMessage = contactMessage.trim()
 
-    const payload = {
-      name: normalizedName,
-      email: normalizedEmail,
-      message: normalizedMessage,
-    }
-
-    if (!payload.name || !payload.email || !payload.message) {
-      setContactStatus({ state: 'error', message: 'Completa nombre, email y mensaje.' })
+    if (!normalizedName || !normalizedMessage) {
+      setContactStatus({ state: 'error', message: 'Por favor completa nombre y mensaje antes de enviar.' })
       return
     }
+    setContactStatus({ state: 'idle' })
 
-    if (payload.name.length < 2) {
-      setContactStatus({ state: 'error', message: 'El nombre debe tener al menos 2 caracteres.' })
-      return
+    const subject = `Contacto desde Portafolio: ${normalizedName}`
+    const body = `Nombre: ${normalizedName}\nEmail de contacto: ${contactEmail}\n\nMensaje:\n${normalizedMessage}`
+    const to = 'andresaoe@gmail.com'
+
+    let url = ''
+
+    switch (provider) {
+      case 'gmail':
+        url = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        break
+      case 'outlook':
+        url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        break
+      case 'yahoo':
+        url = `https://compose.mail.yahoo.com/?to=${to}&subj=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        break
+      case 'default':
+      default:
+        url = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        break
     }
 
-    if (payload.name.length > 80) {
-      setContactStatus({ state: 'error', message: 'El nombre es demasiado largo.' })
-      return
-    }
+    window.open(url, '_blank')
+  }
 
-    if (payload.email.length > 254) {
-      setContactStatus({ state: 'error', message: 'El email es demasiado largo.' })
-      return
-    }
-
-    if (/\s/.test(payload.email)) {
-      setContactStatus({ state: 'error', message: 'El email no debe contener espacios.' })
-      return
-    }
-
-    if (payload.message.length < 10) {
-      setContactStatus({ state: 'error', message: 'El mensaje debe tener al menos 10 caracteres.' })
-      return
-    }
-
-    if (payload.message.length > 2000) {
-      setContactStatus({ state: 'error', message: 'El mensaje es demasiado largo.' })
-      return
-    }
-
-    setContactStatus({ state: 'sending' })
-
-    const { error } = await supabase.from('contact_messages').insert(payload)
-
-    if (error) {
-      const rawMessage = error.message ?? 'No se pudo enviar el mensaje.'
-      const friendlyMessage = rawMessage.includes('relation "contact_messages" does not exist')
-        ? 'Falta crear la tabla contact_messages en Supabase.'
-        : rawMessage.includes('contact_messages_email_format')
-          ? 'Supabase rechazó el email por la constraint contact_messages_email_format. Ajusta el CHECK en Supabase para aceptar emails válidos.'
-        : rawMessage.includes('row-level security')
-          ? 'Supabase está bloqueando el envío (RLS). Crea una policy de INSERT para la tabla contact_messages.'
-          : rawMessage
-
-      setContactStatus({ state: 'error', message: friendlyMessage })
-      return
-    }
-
-    setContactName('')
-    setContactEmail('')
-    setContactMessage('')
-
-    let notifyError: unknown = null
-    try {
-      const { error: invokeError } = await supabase.functions.invoke('send-contact-email', {
-        body: payload,
-      })
-      notifyError = invokeError
-    } catch (err) {
-      notifyError = err
-    }
-
-    if (notifyError) {
-      setContactStatus({
-        state: 'success',
-        message: 'Mensaje enviado. Si no recibes respuesta pronto, contáctame por LinkedIn.',
-      })
-      return
-    }
-
-    setContactStatus({ state: 'success', message: 'Mensaje enviado. Gracias.' })
+  function handleSubmitContact(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    // Por defecto abrimos el cliente de correo predeterminado
+    openEmailClient('default')
   }
 
   return (
@@ -1090,55 +1014,81 @@ function App() {
                         className="h-11 rounded-lg border border-white/10 bg-slate-950/40 px-3 text-slate-100 outline-none placeholder:text-slate-500 focus:border-sky-300"
                         placeholder="Tu nombre"
                         autoComplete="name"
-                        disabled={contactStatus.state === 'sending'}
-                      />
-                    </label>
-                    <label className="grid gap-2 text-sm">
-                      <span className="text-slate-200">Email</span>
-                      <input
-                        type="email"
-                        required
-                        maxLength={254}
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
-                        className="h-11 rounded-lg border border-white/10 bg-slate-950/40 px-3 text-slate-100 outline-none placeholder:text-slate-500 focus:border-sky-300"
-                        placeholder="tu@email.com"
-                        autoComplete="email"
-                        inputMode="email"
-                        disabled={contactStatus.state === 'sending'}
-                      />
-                    </label>
-                  </div>
-
-                  <label className="grid gap-2 text-sm">
-                    <span className="text-slate-200">Mensaje</span>
-                    <textarea
-                      required
-                      minLength={10}
-                      maxLength={2000}
-                      value={contactMessage}
-                      onChange={(e) => setContactMessage(e.target.value)}
-                      className="min-h-28 rounded-lg border border-white/10 bg-slate-950/40 px-3 py-3 text-slate-100 outline-none placeholder:text-slate-500 focus:border-sky-300"
-                      placeholder="Cuéntame en qué puedo ayudarte…"
-                      disabled={contactStatus.state === 'sending'}
+                        disabled={false}
                     />
                   </label>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <button
-                      type="submit"
-                      disabled={!supabaseReady || contactStatus.state === 'sending'}
-                      className="rounded-lg bg-sky-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {contactStatus.state === 'sending' ? 'Enviando…' : 'Enviar mensaje'}
-                    </button>
+                  <label className="grid gap-2 text-sm">
+                    <span className="text-slate-200">Email</span>
+                    <input
+                      type="email"
+                      required
+                      maxLength={254}
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      className="h-11 rounded-lg border border-white/10 bg-slate-950/40 px-3 text-slate-100 outline-none placeholder:text-slate-500 focus:border-sky-300"
+                      placeholder="tu@email.com"
+                      autoComplete="email"
+                      inputMode="email"
+                      disabled={false}
+                    />
+                  </label>
+                </div>
 
-                    <div className="text-sm text-slate-300">
-                      {!supabaseEnvReady
-                        ? 'No se detectaron variables de Supabase. Reinicia el servidor de Vite.'
-                        : !supabaseReady
-                          ? 'No se pudo inicializar Supabase.'
-                          : null}
+                <label className="grid gap-2 text-sm">
+                  <span className="text-slate-200">Mensaje</span>
+                  <textarea
+                    required
+                    minLength={10}
+                    maxLength={2000}
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                    className="min-h-28 rounded-lg border border-white/10 bg-slate-950/40 px-3 py-3 text-slate-100 outline-none placeholder:text-slate-500 focus:border-sky-300"
+                    placeholder="Cuéntame en qué puedo ayudarte…"
+                    disabled={false}
+                  />
+                </label>
+
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-sky-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-sky-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                      >
+                        Enviar (App por defecto)
+                      </button>
+
+                      <span className="text-sm text-slate-400">o enviar con:</span>
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEmailClient('gmail')}
+                          className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                          title="Abrir en Gmail"
+                        >
+                          <BrandIcon name="Gmail" className="h-4 w-4" />
+                          <span className="sr-only sm:not-sr-only">Gmail</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openEmailClient('outlook')}
+                          className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                          title="Abrir en Outlook"
+                        >
+                          <BrandIcon name="Outlook" className="h-4 w-4" />
+                          <span className="sr-only sm:not-sr-only">Outlook</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openEmailClient('yahoo')}
+                          className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                          title="Abrir en Yahoo"
+                        >
+                          <BrandIcon name="Yahoo" className="h-4 w-4" />
+                          <span className="sr-only sm:not-sr-only">Yahoo</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -1147,11 +1097,7 @@ function App() {
                       {contactStatus.message}
                     </div>
                   ) : null}
-                  {contactStatus.state === 'success' ? (
-                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-100">
-                      {contactStatus.message}
-                    </div>
-                  ) : null}
+
                 </form>
               </div>
             </section>
