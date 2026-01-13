@@ -245,7 +245,7 @@ function App() {
                     key={l.label}
                     href={l.href}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
                   >
                     <span className="text-slate-100">
@@ -488,7 +488,7 @@ function App() {
                                     <a
                                       href={b.href}
                                       target="_blank"
-                                      rel="noreferrer"
+                                      rel="noopener noreferrer"
                                       className={frameClass}
                                       onClick={(e) => {
                                         e.preventDefault()
@@ -529,7 +529,7 @@ function App() {
                     key={p.name}
                     href={p.href ?? '#'}
                     target={p.href ? '_blank' : undefined}
-                    rel={p.href ? 'noreferrer' : undefined}
+                    rel={p.href ? 'noopener noreferrer' : undefined}
                     className="group rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 sm:p-6"
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -582,7 +582,7 @@ function App() {
                             key={`${g.title}-${name}`}
                             href="https://www.trae.ai/"
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                             className={className}
                           >
                             {content}
