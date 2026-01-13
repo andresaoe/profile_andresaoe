@@ -261,7 +261,7 @@ function App() {
                   href="#skills"
                   className="rounded-lg bg-sky-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-sky-300"
                 >
-                  Ver habilidades
+                  Habilidades
                 </a>
                 <a
                   href="#contact"

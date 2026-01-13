@@ -306,56 +306,6 @@ export const profile: Profile = {
           howToEarn: 'Unirte a un Google Developer Group (por ejemplo, GDG Cali).',
           href: 'https://gdg.community.dev/gdg-cali/',
         },
-        {
-          src: 'https://developers.google.com/profile/badges/events/3P/SDGCPMeetup/badge.svg',
-          alt: 'Evento: SDGCP Meetup',
-          howToEarn: 'Asistir al evento/meetup SDGCP Meetup (insignia de evento).',
-          href: 'https://developers.google.com/profile/badges/events/3P/SDGCPMeetup/badge.svg',
-        },
-        {
-          src: 'https://developers.google.com/profile/badges/community/build-with-ai/2025/workshop-attendee/badge.svg',
-          alt: 'Build with AI 2025: Workshop Attendee',
-          howToEarn: 'Asistir a un evento o taller de la serie Build with AI 2025.',
-          href: 'https://developers.google.com/profile/badges/community/build-with-ai/2025/workshop-attendee/badge.svg',
-        },
-        {
-          src: 'https://developers.google.com/profile/badges/playlists/android/android-enterprise-build-apps/badge.svg',
-          alt: 'Android: Android Enterprise (Build Apps)',
-          howToEarn:
-            'Completar la ruta de aprendizaje “Build enterprise apps on Android” y su quiz asociado.',
-          href: 'https://developers.google.com/profile/badges/playlists/android/android-enterprise-build-apps/badge.svg',
-        },
-        {
-          src: 'https://developers.google.com/profile/badges/community/dsc/2021/core_member/badge.svg',
-          alt: 'DSC 2021: Core Member',
-          howToEarn: 'Ser parte del core team de un Google Developer Student Club (GDSC) en 2021–2022.',
-          href: 'https://developers.google.com/profile/badges/community/dsc/2021/core_member/badge.svg',
-          frame: 'purple',
-        },
-        {
-          src: '/microsoft-certified-associate-badge.svg',
-          alt: 'Microsoft Certified: Associate',
-          howToEarn:
-            'Obtener una certificación Microsoft Certified de nivel Associate, aprobando el/los exámenes requeridos para esa certificación específica.',
-          href: 'https://learn.microsoft.com/en-us/credentials/',
-          frame: 'blue',
-        },
-        {
-          src: '/microsoft-certified-fundamentals-badge.svg',
-          alt: 'Microsoft Certified: Fundamentals',
-          howToEarn:
-            'Obtener una certificación Microsoft Certified Fundamentals, aprobando un examen de nivel Fundamentals correspondiente a la certificación elegida.',
-          href: 'https://learn.microsoft.com/en-us/credentials/',
-          frame: 'blue',
-        },
-        {
-          src: '/microsoft-certified-specialty-badge.svg',
-          alt: 'Microsoft Certified: Specialty',
-          howToEarn:
-            'Obtener una certificación Microsoft Certified de nivel Specialty, aprobando el examen requerido para una certificación de especialidad específica.',
-          href: 'https://learn.microsoft.com/en-us/credentials/',
-          frame: 'blue',
-        },
       ],
     },
     {
